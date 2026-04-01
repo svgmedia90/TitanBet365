@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>TitanBet 365</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+<style>
+body { margin:0; font-family:Arial; background:#0b0f1a; color:white; }
+
+/* HEADER */
+.header {
+ display:flex; justify-content:space-between; padding:10px; background:#111;
+}
+.header img { width:35px; }
+
+/* BUTTON */
+.btn { padding:8px 15px; border-radius:20px; border:none; }
+.login { background:orange; }
+.signup { background:black; color:orange; border:1px solid orange; }
+
+/* MATCH */
+.match {
+ background:#111827;
+ margin:10px;
+ padding:15px;
+ border-radius:10px;
+}
+
+/* AUTH */
+.auth {
+ display:none;
+ width:320px;
+ margin:80px auto;
+ background:#111;
+ padding:20px;
+ border-radius:10px;
+ text-align:center;
+}
+
+input {
+ width:100%;
+ padding:10px;
+ margin:8px 0;
+ border-radius:8px;
+ border:none;
+}
+
+button {
+ width:100%;
+ padding:10px;
+ background:orange;
+ border:none;
+ border-radius:8px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+ <img src="logo.png">
+ <div>
+   <button class="btn login" onclick="showLogin()">LOGIN</button>
+   <button class="btn signup" onclick="showSignup()">SIGN UP</button>
+ </div>
+</div>
+
+<!-- MATCHES -->
+<div id="matches"></div>
+
+<!-- LOGIN -->
+<div class="auth" id="login">
+<img src="logo.png" width="60">
+<h3>Login</h3>
+<input id="loginEmail" placeholder="Email">
+<input id="loginPass" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+</div>
+
+<!-- SIGNUP -->
+<div class="auth" id="signup">
+<img src="logo.png" width="60">
+<h3>Signup</h3>
+<input id="signupEmail" placeholder="Email">
+<input id="signupPass" type="password" placeholder="Password">
+<button onclick="signup()">Signup</button>
+</div>
+
+<script>
+
+/* FIREBASE CONFIG (PUT YOURS HERE) */
+const firebaseConfig = {
+ apiKey: "YOUR_KEY",
+ authDomain: "YOUR_PROJECT.firebaseapp.com"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+/* AUTH */
+function signup(){
+ let email = document.getElementById("signupEmail").value;
+ let pass = document.getElementById("signupPass").value;
+
+ firebase.auth().createUserWithEmailAndPassword(email, pass)
+ .then(()=>alert("Signup Success"))
+ .catch(e=>alert(e.message));
+}
+
+function login(){
+ let email = document.getElementById("loginEmail").value;
+ let pass = document.getElementById("loginPass").value;
+
+ firebase.auth().signInWithEmailAndPassword(email, pass)
+ .then(()=>alert("Login Success"))
+ .catch(e=>alert(e.message));
+}
+
+function showLogin(){ document.getElementById("login").style.display="block"; }
+function showSignup(){ document.getElementById("signup").style.display="block"; }
+
+/* LIVE MATCH API */
+fetch("https://api.cricapi.com/v1/currentMatches?apikey=YOUR_API_KEY")
+.then(res=>res.json())
+.then(data=>{
+ let html="";
+ data.data.slice(0,10).forEach(match=>{
+   html += `
+   <div class="match">
+     <b>${match.name}</b><br>
+     ${match.status}<br>
+     <span style="color:#00bcd4">Back 1.8</span>
+     <span style="color:pink">Lay 2.1</span>
+   </div>`;
+ });
+ document.getElementById("matches").innerHTML = html;
+});
+</script>
+
+</body>
+</html>
